@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: satquery-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - BACKEND_PORT=8000
+      - DATABASE_PATH=/app/data/satquery.db
+    volumes:
+      - ./data:/app/data
+      - ./checkpoints:/app/checkpoints
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: satquery-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped

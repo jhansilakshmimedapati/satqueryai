@@ -1,0 +1,54 @@
+# SatQuery AI - Remote Sensing Adaptation Configuration
+experiment:
+  name: "satquery_bigearthnet_swinb"
+  description: "Cross-modal adaptation of Swin-Transformer vision-language backbone on BigEarthNet"
+
+dataset:
+  name: "BigEarthNet-S2-S1"
+  root_dir: "data/bigearthnet"
+  modalities:
+    - "optical_s2"
+    - "sar_s1"
+  s2_bands:
+    - "B01" # Coastal aerosol
+    - "B02" # Blue
+    - "B03" # Green
+    - "B04" # Red
+    - "B05" # Vegetation red edge 1
+    - "B06" # Vegetation red edge 2
+    - "B07" # Vegetation red edge 3
+    - "B08" # NIR
+    - "B8A" # Narrow NIR
+    - "B09" # Water vapour
+    - "B11" # SWIR 1
+    - "B12" # SWIR 2
+  s1_polarizations:
+    - "VV"
+    - "VH"
+  image_size: [120, 120]
+  num_classes: 43 # Corine Land Cover classes
+
+model:
+  backbone: "Swin-B"
+  pretrained: true
+  freeze_early_stages: true
+  fusion_type: "cross_attention"
+  projection_dim: 768
+
+training:
+  batch_size: 32
+  epochs: 15
+  optimizer: "AdamW"
+  lr: 0.0001
+  weight_decay: 0.01
+  scheduler: "cosine"
+  warmup_epochs: 2
+  gradient_clipping: 1.0
+  mixed_precision: "fp16"
+
+evaluation:
+  val_interval: 1
+  metrics:
+    - "macro_f1"
+    - "micro_f1"
+    - "mean_iou"
